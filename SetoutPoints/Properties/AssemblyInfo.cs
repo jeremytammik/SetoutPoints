@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle( "Revit Setout Points Add-In" )]
-[assembly: AssemblyDescription( "Automatically generate setout points on geometry vertices of structural elements" )]
+[assembly: AssemblyDescription( "Automatically generate and manage setout points on geometry vertices of structural elements" )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "Autodesk Inc." )]
 [assembly: AssemblyProduct( "Revit Setout Points Add-In" )]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "2012.0.0.1" )]
-[assembly: AssemblyFileVersion( "2012.0.0.1" )]
+[assembly: AssemblyVersion( "2013.0.0.1" )]
+[assembly: AssemblyFileVersion( "2013.0.0.1" )]
