@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Create Setout Points</Text>
+    <Description>Create setout points on all structural element geoemtry vertices</Description>
+    <Assembly>SetoutPoints.dll</Assembly>
+    <FullClassName>SetoutPoints.Command</FullClassName>
+    <ClientId>3abb48c0-df28-4041-bc26-c1ed0e8f7e8e</ClientId>
+    <VendorId>TBC_</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+  <AddIn Type="Command">
+    <Text>Renumber Key Setout Points</Text>
+    <Description>Renumber key setout points</Description>
+    <Assembly>SetoutPoints.dll</Assembly>
+    <FullClassName>SetoutPoints.Command2</FullClassName>
+    <ClientId>37dd5d7e-019d-4fbc-8961-ff8663ae314a</ClientId>
+    <VendorId>TBC_</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>
