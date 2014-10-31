@@ -13,7 +13,7 @@ using Autodesk.Revit.UI;
 namespace SetoutPoints
 {
   [Transaction( TransactionMode.Manual )]
-  public class Command : IExternalCommand
+  public class CmdGeomVertices : IExternalCommand
   {
     /// <summary>
     /// Return a string for a real number
@@ -151,7 +151,9 @@ namespace SetoutPoints
     /// </summary>
     Dictionary<XYZ,int> GetCorners( Solid solid )
     {
-      Dictionary<XYZ, int> corners = new Dictionary<XYZ, int>( new XyzEqualityComparer() );
+      Dictionary<XYZ, int> corners 
+        = new Dictionary<XYZ, int>( 
+          new XyzEqualityComparer() );
 
       foreach( Face f in solid.Faces )
       {
@@ -159,7 +161,8 @@ namespace SetoutPoints
         {
           foreach( Edge e in ea )
           {
-            XYZ p = e.AsCurveFollowingFace( f ).get_EndPoint( 0 );
+            XYZ p = e.AsCurveFollowingFace( f )
+              .get_EndPoint( 0 );
 
             if( !corners.ContainsKey( p ) )
             {
@@ -211,8 +214,11 @@ namespace SetoutPoints
       List<ElementFilter> b
         = new List<ElementFilter>( 2 );
 
-      b.Add( new StructuralMaterialTypeFilter( StructuralMaterialType.Concrete ) );
-      b.Add( new StructuralMaterialTypeFilter( StructuralMaterialType.PrecastConcrete ) );
+      b.Add( new StructuralMaterialTypeFilter( 
+        StructuralMaterialType.Concrete ) );
+
+      b.Add( new StructuralMaterialTypeFilter( 
+        StructuralMaterialType.PrecastConcrete ) );
 
       LogicalOrFilter structuralMaterialFilter 
         = new LogicalOrFilter( b );
@@ -220,7 +226,9 @@ namespace SetoutPoints
       List<ElementFilter> c
         = new List<ElementFilter>( 3 );
 
-      c.Add( new ElementClassFilter( typeof( FamilyInstance ) ) );
+      c.Add( new ElementClassFilter( 
+        typeof( FamilyInstance ) ) );
+
       c.Add( structuralMaterialFilter );
       c.Add( categoryFilter );
 
@@ -236,8 +244,8 @@ namespace SetoutPoints
       d.Add( new ElementClassFilter(
         typeof( Floor ) ) );
 
-      d.Add( new ElementClassFilter(
-        typeof( ContFooting ) ) );
+      //d.Add( new ElementClassFilter(
+      //  typeof( ContFooting ) ) );
 
 #if NEED_LOADS
       d.Add( new ElementClassFilter(
@@ -265,17 +273,14 @@ namespace SetoutPoints
 
     #region Setout point family identification constants
 
-    public const string FamilyName
-      = "SetoutPoint2012";
+    public const string FamilyName = "SetoutPoint";
  
-    //public const string SymbolName
-    //  = "SetoutPoint";
+    public const string SymbolName = "SetoutPoint";
  
-    const string _extension
-      = ".rfa";
+    const string _extension = ".rfa";
  
     const string _directory
-      = "C:/tmp/revit/SetoutPoints/test/";
+      = "C:/a/doc/revit/blog/src/SetoutPoints/test/";
  
     const string _family_path
       = _directory + FamilyName + _extension;
@@ -376,7 +381,7 @@ namespace SetoutPoints
     }
 
     /// <summary>
-    /// Retrieve or load a specific family symbol.
+    /// Retrieve or load the setout point family symbols.
     /// </summary>
     public static FamilySymbol [] GetFamilySymbols( 
       Document doc, 
@@ -397,20 +402,23 @@ namespace SetoutPoints
       {
         // Load the setout point family
 
-        Transaction tx = new Transaction( doc );
-
-        tx.Start( "Load Setout Point Family" );
-
-        //if( !doc.LoadFamilySymbol(
-        //  _family_path, SymbolName, out symbol ) )
-
-        if( doc.LoadFamily( _family_path, out family ) )
+        using( Transaction tx = new Transaction( 
+          doc ) )
         {
-          tx.Commit();
-        }
-        else
-        {
-          tx.RollBack();
+          tx.Start( "Load Setout Point Family" );
+
+          //if( !doc.LoadFamilySymbol(
+          //  _family_path, SymbolName, out symbol ) )
+
+          if( doc.LoadFamily( _family_path, 
+            out family ) )
+          {
+            tx.Commit();
+          }
+          else
+          {
+            tx.RollBack();
+          }
         }
       }
 
@@ -425,10 +433,12 @@ namespace SetoutPoints
           symbols[i++] = s;
         }
 
-        Debug.Assert( symbols[0].Name.EndsWith( "Major" ), 
+        Debug.Assert( 
+          symbols[0].Name.EndsWith( "Major" ), 
           "expected major (key) setout point first" );
 
-        Debug.Assert( symbols[1].Name.EndsWith( "Minor" ), 
+        Debug.Assert( 
+          symbols[1].Name.EndsWith( "Minor" ), 
           "expected minor setout point second" );
       }
       return symbols;
@@ -458,7 +468,7 @@ namespace SetoutPoints
       // and no contents in the instance geometry 
       // (e.g. in rst_basic_sample_project.rvt).
 
-      foreach( GeometryObject obj in geo.Objects )
+      foreach( GeometryObject obj in geo )
       {
         solid = obj as Solid;
 
@@ -476,7 +486,7 @@ namespace SetoutPoints
         geo = inst.GetSymbolGeometry();
         t = inst.Transform;
 
-        foreach( GeometryObject obj in geo.Objects )
+        foreach( GeometryObject obj in geo )
         {
           solid = obj as Solid;
 
@@ -490,6 +500,14 @@ namespace SetoutPoints
       return solid;
     }
 
+    //const double _feetToMm = 25.4 * 12.0;
+
+    /// <summary>
+    /// Setout point number, continues growing from
+    /// one command launch to the next.
+    /// </summary>
+    static int _point_number = 0;
+
     public Result Execute(
       ExternalCommandData commandData,
       ref string message,
@@ -499,7 +517,6 @@ namespace SetoutPoints
       UIDocument uidoc = uiapp.ActiveUIDocument;
       Application app = uiapp.Application;
       Document doc = uidoc.Document;
-      Transaction tx;
 
       // Useless initial attempt to retrieve project 
       // location to calculate project location:
@@ -513,7 +530,7 @@ namespace SetoutPoints
       Transform projectLocationTransform 
         = GetProjectLocationTransform( doc );
 
-      // Load or retrieve setout point family symbol:
+      // Load or retrieve setout point family symbols:
 
       FamilySymbol [] symbols 
         = GetFamilySymbols( doc, true );
@@ -527,6 +544,8 @@ namespace SetoutPoints
         return Result.Failed;
       }
 
+      // Retrieve structural concrete elements.
+
       FilteredElementCollector col 
         = GetStructuralElements( doc );
 
@@ -537,236 +556,130 @@ namespace SetoutPoints
       // one each time the command is run with
       // no decoration or prefix whatsoever.
 
-      int point_number = 0;
-
-      tx = new Transaction( doc );
-
-      tx.Start( "Place Setout Points" );
-
-      Options opt = app.Create.NewGeometryOptions();
-
-      // On the very first attempt only, run an error 
-      // check to see whether the required shared 
-      // parameters have actually been bound:
-
-      bool first = true;
-
-      foreach( Element e in col )
+      using( Transaction tx = new Transaction( doc ) )
       {
-        Solid solid = GetSolid( e, opt );
+        tx.Start( "Place Setout Points" );
 
-        string desc = ElementDescription( e );
+        Options opt = app.Create.NewGeometryOptions();
 
-        if( null == solid )
+        // On the very first attempt only, run an error 
+        // check to see whether the required shared 
+        // parameters have actually been bound:
+
+        bool first = true;
+
+        foreach( Element e in col )
         {
-          Debug.Print( 
-            "Unable to access element solid for element {0}.",
-            desc );
+          Solid solid = GetSolid( e, opt );
 
-          continue;
-        }
+          string desc = ElementDescription( e );
 
-        Dictionary<XYZ, int> corners 
-          = GetCorners( solid );
-
-        int n = corners.Count;
-
-        Debug.Print( "{0}: {1} corners found:", desc, n );
-
-        foreach( XYZ p in corners.Keys )
-        {
-          ++point_number;
-
-          Debug.Print( "  {0}: {1}", 
-            point_number, PointString( p ) );
-
-          FamilyInstance fi 
-            = doc.Create.NewFamilyInstance( p, 
-              symbols[1], StructuralType.NonStructural );
-
-#region Test shared parameter availability
-#if TEST_SHARED_PARAMETERS
-          // Test code to ensure that the shared parameters really are available
-
-          Parameter p1 = fi.get_Parameter( "X" );
-          Parameter p2 = fi.get_Parameter( "Y" );
-          Parameter p3 = fi.get_Parameter( "Z" );
-          Parameter p4 = fi.get_Parameter( "Host_Geometry" );
-          Parameter p5 = fi.get_Parameter( "Point_Number" );
-
-          //doc.Regenerate(); // no need for this, thankfully
-
-          //Parameter p11 = fi.get_Parameter( "{7a5d1056-a1df-4389-b026-9f32fc3ac5fb}" );
-          //Parameter p12 = fi.get_Parameter( "7a5d1056-a1df-4389-b026-9f32fc3ac5fb" );
-#endif // TEST_SHARED_PARAMETERS
-#endregion // Test shared parameter availability
-
-          // Add shared parameter data immediately 
-          // after creating the new family instance.
-          // The shared parameters are indeed added 
-          // immediately by Revit, so we can access and
-          // populate them.
-          // No need to commit the transaction that 
-          // added the family instance to give Revit 
-          // a chance to add the shared parameters to 
-          // it, nor to regenerate the document, we 
-          // can write the shared parameter values 
-          // right away.
-
-          if( first )
+          if( null == solid )
           {
-            Parameter q = fi.get_Parameter( 
-              _parameter_x );
+            Debug.Print(
+              "Unable to access element solid for element {0}.",
+              desc );
 
-            if( null == q )
-            {
-              message = "The required shared parameters "
-                + "X, Y, Z, Host_Id, Host_Type and "
-                + "Point_Number are missing.";
-
-              tx.RollBack();
-
-              return Result.Failed;
-            }
-            first = false;
+            continue;
           }
 
-          // Transform insertion point by applying
-          // base point offset, scaling from feet,
-          // and rotating to project north.
-          //XYZ r1 = ( p + basePoint) * _feetToMm;
+          Dictionary<XYZ, int> corners
+            = GetCorners( solid );
 
-          // Transform insertion point by applying
-          // project location transformation.
+          int n = corners.Count;
 
-          XYZ r2 = projectLocationTransform.OfPoint( p );
+          Debug.Print( "{0}: {1} corners found:", desc, n );
 
-          fi.get_Parameter( _parameter_host_type ).Set(
-            GetHostType( e ).ToString() );
+          foreach( XYZ p in corners.Keys )
+          {
+            ++_point_number;
 
-          fi.get_Parameter( _parameter_host_id ).Set( 
-            e.Id.IntegerValue );
+            Debug.Print( "  {0}: {1}",
+              _point_number, PointString( p ) );
 
-          fi.get_Parameter( _parameter_point_nr ).Set( 
-            point_number.ToString() );
+            FamilyInstance fi
+              = doc.Create.NewFamilyInstance( p,
+                symbols[1], StructuralType.NonStructural );
 
-          fi.get_Parameter( _parameter_x ).Set( r2.X );
-          fi.get_Parameter( _parameter_y ).Set( r2.Y );
-          fi.get_Parameter( _parameter_z ).Set( r2.Z );
+            #region Test shared parameter availability
+    #if TEST_SHARED_PARAMETERS
+            // Test code to ensure that the shared 
+            // parameters really are available
+
+            Parameter p1 = fi.get_Parameter( "X" );
+            Parameter p2 = fi.get_Parameter( "Y" );
+            Parameter p3 = fi.get_Parameter( "Z" );
+            Parameter p4 = fi.get_Parameter( "Host_Geometry" );
+            Parameter p5 = fi.get_Parameter( "Point_Number" );
+
+            //doc.Regenerate(); // no need for this, thankfully
+
+            //Parameter p11 = fi.get_Parameter( 
+            //  "{7a5d1056-a1df-4389-b026-9f32fc3ac5fb}" );
+
+            //Parameter p12 = fi.get_Parameter( 
+            //  "7a5d1056-a1df-4389-b026-9f32fc3ac5fb" );
+    #endif // TEST_SHARED_PARAMETERS
+            #endregion // Test shared parameter availability
+
+            // Add shared parameter data immediately 
+            // after creating the new family instance.
+            // The shared parameters are indeed added 
+            // immediately by Revit, so we can access and
+            // populate them.
+            // No need to commit the transaction that 
+            // added the family instance to give Revit 
+            // a chance to add the shared parameters to 
+            // it, nor to regenerate the document, we 
+            // can write the shared parameter values 
+            // right away.
+
+            if( first )
+            {
+              Parameter q = fi.get_Parameter(
+                _parameter_x );
+
+              if( null == q )
+              {
+                message = 
+                  "The required shared parameters "
+                  + "X, Y, Z, Host_Id, Host_Type and "
+                  + "Point_Number are missing.";
+
+                tx.RollBack();
+
+                return Result.Failed;
+              }
+              first = false;
+            }
+
+            // Transform insertion point by applying
+            // base point offset, scaling from feet,
+            // and rotating to project north.
+            //XYZ r1 = ( p + basePoint) * _feetToMm;
+
+            // Transform insertion point by applying
+            // project location transformation.
+
+            XYZ r2 = projectLocationTransform.OfPoint( p );
+
+            fi.get_Parameter( _parameter_host_type ).Set(
+              GetHostType( e ).ToString() );
+
+            fi.get_Parameter( _parameter_host_id ).Set(
+              e.Id.IntegerValue );
+
+            fi.get_Parameter( _parameter_point_nr ).Set(
+              _point_number.ToString() );
+
+            fi.get_Parameter( _parameter_x ).Set( r2.X );
+            fi.get_Parameter( _parameter_y ).Set( r2.Y );
+            fi.get_Parameter( _parameter_z ).Set( r2.Z );
+          }
         }
+
+        tx.Commit();
       }
-
-      tx.Commit();
-
-      return Result.Succeeded;
-    }
-  }
-
-  /// <summary>
-  /// Renumber key setout points. We add a prefix
-  /// "SOP " (defined by the static class variable 
-  /// _sop_prefix) and restart numbering from one.
-  /// </summary>
-  [Transaction( TransactionMode.Manual )]
-  public class Command2 : IExternalCommand
-  {
-    const string _sop_prefix = "SOP ";
-
-    public Result Execute(
-      ExternalCommandData commandData,
-      ref string message,
-      ElementSet elements )
-    {
-      UIApplication uiapp = commandData.Application;
-      UIDocument uidoc = uiapp.ActiveUIDocument;
-      Document doc = uidoc.Document;
-
-      FamilySymbol [] symbols 
-        = Command.GetFamilySymbols( doc, false );
-
-      if( null == symbols )
-      {
-        TaskDialog.Show( "Setout Points",
-          "Setout point family not loaded, "
-          + "so no setout points present." );
-
-        return Result.Succeeded;
-      }
-
-      // Filter for key setout points.
-      // They are family instances with the generic 
-      // model category whose Key_Setout_Point
-      // shared parameter is set to true.
-      // To get the key points only, we initially set 
-      // up a parameter filter. For that, we need a
-      // parameter definition to set up the parameter 
-      // filter.
-      // Later, we decided to switch type when we 
-      // promote a setout point to a major or key 
-      // point, so there is no need to filter for 
-      // a parameter value at all; we can just 
-      // filter for the major setout point type
-      // instead.
-
-      //FamilySymbolFilter symbolFilter 
-      //  = new FamilySymbolFilter( symbol.Family.Id );
-
-      //Element e
-      //  = new FilteredElementCollector( doc )
-      //    .WherePasses( symbolFilter )
-      //    .FirstElement();
-
-      //LogicalOrFilter f = new LogicalOrFilter(
-      //  new FamilyInstanceFilter( doc, symbols[0].Id ),
-      //  new FamilyInstanceFilter( doc, symbols[1].Id ) );
-
-      FamilyInstanceFilter instanceFilter 
-        = new FamilyInstanceFilter( doc, symbols[0].Id );
-
-      FilteredElementCollector col
-        = new FilteredElementCollector( doc )
-          .OfCategory( BuiltInCategory.OST_GenericModel )
-          .OfClass( typeof( FamilyInstance ) )
-          .WherePasses( instanceFilter );
-
-      //if( null == e )
-      //{
-      //  TaskDialog.Show( "Setout Points",
-      //    "No key setout point found. " );
-      //  return Result.Succeeded;
-      //}
-
-      //Parameter shared_parameter
-      //  = e.get_Parameter( Command._parameter_key );
-      //ParameterValueProvider provider
-      //  = new ParameterValueProvider( 
-      //    shared_parameter.Id );
-      //FilterNumericRuleEvaluator evaluator
-      //  = new FilterNumericEquals();
-      //FilterRule rule
-      //  = new FilterIntegerRule( 
-      //    provider, evaluator, 1 );
-      //ElementFilter paramFilter
-      //  = new ElementParameterFilter( rule );
-      //FilteredElementCollector col
-      //  = new FilteredElementCollector( doc )
-      //    .WherePasses( symbolFilter )
-      //    .WherePasses( paramFilter );
-
-      Transaction tx = new Transaction( doc );
-
-      tx.Start( "Renumber Setout Points" );
-
-      int i = 0;
-
-      foreach( Element p in col )
-      {
-        p.get_Parameter( Command._parameter_point_nr )
-          .Set( _sop_prefix + ( ++i ).ToString() );
-      }
-
-      tx.Commit();
-
       return Result.Succeeded;
     }
   }
