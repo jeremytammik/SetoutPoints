@@ -162,7 +162,7 @@ namespace SetoutPoints
           foreach( Edge e in ea )
           {
             XYZ p = e.AsCurveFollowingFace( f )
-              .get_EndPoint( 0 );
+              .GetEndPoint( 0 );
 
             if( !corners.ContainsKey( p ) )
             {
@@ -279,8 +279,9 @@ namespace SetoutPoints
  
     const string _extension = ".rfa";
  
-    const string _directory
-      = "C:/a/doc/revit/blog/src/SetoutPoints/test/";
+    const string _directory = 
+      // "C:/a/doc/revit/blog/src/SetoutPoints/test/"; // 2013
+      "Z:/a/doc/revit/blog/src/SetoutPoints/test/"; // 2015
  
     const string _family_path
       = _directory + FamilyName + _extension;
@@ -362,13 +363,17 @@ namespace SetoutPoints
         projectPosition.Elevation );
 
       Transform translationTransform
-        = Transform.get_Translation(
+        = Transform.CreateTranslation(
           translationVector );
 
       // Create a rotation for the angle about true north
 
+      //Transform rotationTransform
+      //  = Transform.get_Rotation( XYZ.Zero,
+      //    XYZ.BasisZ, projectPosition.Angle );
+
       Transform rotationTransform 
-        = Transform.get_Rotation( XYZ.Zero, 
+        = Transform.CreateRotation(
           XYZ.BasisZ, projectPosition.Angle );
 
       // Combine the transforms 
@@ -428,9 +433,13 @@ namespace SetoutPoints
 
         int i = 0;
 
-        foreach( FamilySymbol s in family.Symbols )
+        //foreach( FamilySymbol s in family.Symbols ) // 2014
+
+        foreach( ElementId id in family
+          .GetFamilySymbolIds() ) // 2015
         {
-          symbols[i++] = s;
+          symbols[i++] = doc.GetElement(id) 
+            as FamilySymbol;
         }
 
         Debug.Assert( 
