@@ -610,6 +610,12 @@ namespace SetoutPoints
               = doc.Create.NewFamilyInstance( p,
                 symbols[1], StructuralType.NonStructural );
 
+            XYZ p1 = t.OfPoint( p );
+
+            FamilyInstance fi 
+              = doc.Create.NewFamilyInstance( p1, 
+                symbols[1], StructuralType.NonStructural );
+
             #region Test shared parameter availability
     #if TEST_SHARED_PARAMETERS
             // Test code to ensure that the shared 
