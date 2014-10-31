@@ -11,5 +11,5 @@ Further Reading
 ---------------
 
 - [Melbourne DevLab](http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html)
-- [Commercial use of SetoutPoints application](http://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html)
+- [Commercial use of the SetoutPoints application](http://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html)
 - [Revit API forum discussion thread](http://forums.autodesk.com/t5/revit-api/jeremy-s-setoutpoint/m-p/5372337)
