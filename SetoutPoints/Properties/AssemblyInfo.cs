@@ -32,6 +32,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-// 2014-11-03 2015.0.0.1 added transformation syggested by sanjaymann
+// 2014-11-03 2015.0.0.1 added instance transformation suggested by sanjaymann
 [assembly: AssemblyVersion( "2015.0.0.1" )]
 [assembly: AssemblyFileVersion( "2015.0.0.1" )]

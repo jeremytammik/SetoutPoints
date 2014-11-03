@@ -128,12 +128,12 @@ namespace SetoutPoints
     /// </summary>
     class XyzEqualityComparer : IEqualityComparer<XYZ>
     {
-      const double _sixteenthInchInFeet 
+      const double _sixteenthInchInFeet
         = 1.0 / ( 16.0 * 12.0 );
 
       public bool Equals( XYZ p, XYZ q )
       {
-        return p.IsAlmostEqualTo( q, 
+        return p.IsAlmostEqualTo( q,
           _sixteenthInchInFeet );
       }
 
@@ -149,10 +149,10 @@ namespace SetoutPoints
     /// and will return a "corner" at each of the two arc
     /// end points.
     /// </summary>
-    Dictionary<XYZ,int> GetCorners( Solid solid )
+    Dictionary<XYZ, int> GetCorners( Solid solid )
     {
-      Dictionary<XYZ, int> corners 
-        = new Dictionary<XYZ, int>( 
+      Dictionary<XYZ, int> corners
+        = new Dictionary<XYZ, int>(
           new XyzEqualityComparer() );
 
       foreach( Face f in solid.Faces )
@@ -214,19 +214,19 @@ namespace SetoutPoints
       List<ElementFilter> b
         = new List<ElementFilter>( 2 );
 
-      b.Add( new StructuralMaterialTypeFilter( 
+      b.Add( new StructuralMaterialTypeFilter(
         StructuralMaterialType.Concrete ) );
 
-      b.Add( new StructuralMaterialTypeFilter( 
+      b.Add( new StructuralMaterialTypeFilter(
         StructuralMaterialType.PrecastConcrete ) );
 
-      LogicalOrFilter structuralMaterialFilter 
+      LogicalOrFilter structuralMaterialFilter
         = new LogicalOrFilter( b );
 
       List<ElementFilter> c
         = new List<ElementFilter>( 3 );
 
-      c.Add( new ElementClassFilter( 
+      c.Add( new ElementClassFilter(
         typeof( FamilyInstance ) ) );
 
       c.Add( structuralMaterialFilter );
@@ -274,15 +274,15 @@ namespace SetoutPoints
     #region Setout point family identification constants
 
     public const string FamilyName = "SetoutPoint";
- 
+
     public const string SymbolName = "SetoutPoint";
- 
+
     const string _extension = ".rfa";
- 
-    const string _directory = 
+
+    const string _directory =
       // "C:/a/doc/revit/blog/src/SetoutPoints/test/"; // 2013
       "Z:/a/doc/revit/blog/src/SetoutPoints/test/"; // 2015
- 
+
     const string _family_path
       = _directory + FamilyName + _extension;
 
@@ -302,12 +302,12 @@ namespace SetoutPoints
     /// <summary>
     /// Retrieve project base point.
     /// </summary>
-    bool GetBasePoint( 
-      Document doc, 
-      out XYZ basePoint, 
+    bool GetBasePoint(
+      Document doc,
+      out XYZ basePoint,
       out double north )
     {
-      BuiltInParameter [] bip = new [] {
+      BuiltInParameter[] bip = new[] {
         BuiltInParameter.BASEPOINT_EASTWEST_PARAM,
         BuiltInParameter.BASEPOINT_NORTHSOUTH_PARAM,
         BuiltInParameter.BASEPOINT_ELEVATION_PARAM,
@@ -372,7 +372,7 @@ namespace SetoutPoints
       //  = Transform.get_Rotation( XYZ.Zero,
       //    XYZ.BasisZ, projectPosition.Angle );
 
-      Transform rotationTransform 
+      Transform rotationTransform
         = Transform.CreateRotation(
           XYZ.BasisZ, projectPosition.Angle );
 
@@ -388,17 +388,17 @@ namespace SetoutPoints
     /// <summary>
     /// Retrieve or load the setout point family symbols.
     /// </summary>
-    public static FamilySymbol [] GetFamilySymbols( 
-      Document doc, 
+    public static FamilySymbol[] GetFamilySymbols(
+      Document doc,
       bool loadIt )
     {
-      FamilySymbol [] symbols = null;
+      FamilySymbol[] symbols = null;
 
-      Family family 
+      Family family
         = new FilteredElementCollector( doc )
           .OfClass( typeof( Family ) )
-          .FirstOrDefault<Element>( 
-            e => e.Name.Equals( FamilyName ) ) 
+          .FirstOrDefault<Element>(
+            e => e.Name.Equals( FamilyName ) )
           as Family;
 
       // If the family is not already loaded, do so:
@@ -407,7 +407,7 @@ namespace SetoutPoints
       {
         // Load the setout point family
 
-        using( Transaction tx = new Transaction( 
+        using( Transaction tx = new Transaction(
           doc ) )
         {
           tx.Start( "Load Setout Point Family" );
@@ -415,7 +415,7 @@ namespace SetoutPoints
           //if( !doc.LoadFamilySymbol(
           //  _family_path, SymbolName, out symbol ) )
 
-          if( doc.LoadFamily( _family_path, 
+          if( doc.LoadFamily( _family_path,
             out family ) )
           {
             tx.Commit();
@@ -438,16 +438,16 @@ namespace SetoutPoints
         foreach( ElementId id in family
           .GetFamilySymbolIds() ) // 2015
         {
-          symbols[i++] = doc.GetElement(id) 
+          symbols[i++] = doc.GetElement( id )
             as FamilySymbol;
         }
 
-        Debug.Assert( 
-          symbols[0].Name.EndsWith( "Major" ), 
+        Debug.Assert(
+          symbols[0].Name.EndsWith( "Major" ),
           "expected major (key) setout point first" );
 
-        Debug.Assert( 
-          symbols[1].Name.EndsWith( "Minor" ), 
+        Debug.Assert(
+          symbols[1].Name.EndsWith( "Minor" ),
           "expected minor setout point second" );
       }
       return symbols;
@@ -463,9 +463,9 @@ namespace SetoutPoints
     /// instance transform to map it to the actual
     /// instance project location.
     /// </summary>
-    Solid GetSolid( 
-      Element e, 
-      Options opt, 
+    Solid GetSolid(
+      Element e,
+      Options opt,
       out Transform t )
     {
       GeometryElement geo = e.get_Geometry( opt );
@@ -539,12 +539,12 @@ namespace SetoutPoints
       // Successful retrieval of active project 
       // location position as a transform:
 
-      Transform projectLocationTransform 
+      Transform projectLocationTransform
         = GetProjectLocationTransform( doc );
 
       // Load or retrieve setout point family symbols:
 
-      FamilySymbol [] symbols 
+      FamilySymbol[] symbols
         = GetFamilySymbols( doc, true );
 
       if( null == symbols )
@@ -558,7 +558,7 @@ namespace SetoutPoints
 
       // Retrieve structural concrete elements.
 
-      FilteredElementCollector col 
+      FilteredElementCollector col
         = GetStructuralElements( doc );
 
       // Retrieve element geometry and place a
@@ -617,7 +617,7 @@ namespace SetoutPoints
                 symbols[1], StructuralType.NonStructural );
 
             #region Test shared parameter availability
-    #if TEST_SHARED_PARAMETERS
+#if TEST_SHARED_PARAMETERS
             // Test code to ensure that the shared 
             // parameters really are available
 
@@ -634,7 +634,7 @@ namespace SetoutPoints
 
             //Parameter p12 = fi.get_Parameter( 
             //  "7a5d1056-a1df-4389-b026-9f32fc3ac5fb" );
-    #endif // TEST_SHARED_PARAMETERS
+#endif // TEST_SHARED_PARAMETERS
             #endregion // Test shared parameter availability
 
             // Add shared parameter data immediately 
@@ -656,7 +656,7 @@ namespace SetoutPoints
 
               if( null == q )
               {
-                message = 
+                message =
                   "The required shared parameters "
                   + "X, Y, Z, Host_Id, Host_Type and "
                   + "Point_Number are missing.";
