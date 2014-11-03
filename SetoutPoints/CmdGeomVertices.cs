@@ -463,13 +463,16 @@ namespace SetoutPoints
     /// instance transform to map it to the actual
     /// instance project location.
     /// </summary>
-    Solid GetSolid( Element e, Options opt )
+    Solid GetSolid( 
+      Element e, 
+      Options opt, 
+      out Transform t )
     {
       GeometryElement geo = e.get_Geometry( opt );
 
       Solid solid = null;
       GeometryInstance inst = null;
-      Transform t = Transform.Identity;
+      t = Transform.Identity;
 
       // Some columns have no solids, and we have to 
       // retrieve the geometry from the symbol; 
@@ -579,7 +582,8 @@ namespace SetoutPoints
 
         foreach( Element e in col )
         {
-          Solid solid = GetSolid( e, opt );
+          Transform t;
+          Solid solid = GetSolid( e, opt, out t );
 
           string desc = ElementDescription( e );
 
@@ -606,15 +610,11 @@ namespace SetoutPoints
             Debug.Print( "  {0}: {1}",
               _point_number, PointString( p ) );
 
+            XYZ p1 = t.OfPoint( p );
+
             FamilyInstance fi
-              = doc.Create.NewFamilyInstance( p,
+              = doc.Create.NewFamilyInstance( p1,
                 symbols[1], StructuralType.NonStructural );
-
-            //XYZ p1 = t.OfPoint( p );
-
-            //FamilyInstance fi 
-            //  = doc.Create.NewFamilyInstance( p1, 
-            //    symbols[1], StructuralType.NonStructural );
 
             #region Test shared parameter availability
     #if TEST_SHARED_PARAMETERS
