@@ -6,7 +6,7 @@
     <Assembly>SetoutPoints.dll</Assembly>
     <FullClassName>SetoutPoints.CmdGeomVertices</FullClassName>
     <ClientId>3abb48c0-df28-4041-bc26-c1ed0e8f7e8e</ClientId>
-    <VendorId>TBC_</VendorId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
   </AddIn>
   <AddIn Type="Command">
@@ -15,7 +15,7 @@
     <Assembly>SetoutPoints.dll</Assembly>
     <FullClassName>SetoutPoints.CmdRenumber</FullClassName>
     <ClientId>37dd5d7e-019d-4fbc-8961-ff8663ae314a</ClientId>
-    <VendorId>TBC_</VendorId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
   </AddIn>
   <AddIn Type="Application">
@@ -23,7 +23,7 @@
     <Assembly>SetoutPoints.dll</Assembly>
     <ClientId>70ce87db-9fbc-43e6-9cbd-281dc296914f</ClientId>
     <FullClassName>SetoutPoints.App</FullClassName>
-    <VendorId>TBC_</VendorId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
   </AddIn>
 </RevitAddIns>

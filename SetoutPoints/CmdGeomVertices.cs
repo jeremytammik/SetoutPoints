@@ -56,7 +56,7 @@ namespace SetoutPoints
     /// </summary>
     HostType GetHostType( Element e )
     {
-      if( e is ContFooting )
+      if( e is WallFoundation )
       {
         return HostType.StructuralFoundations;
       }

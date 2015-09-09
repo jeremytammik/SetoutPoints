@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "Autodesk Inc." )]
 [assembly: AssemblyProduct( "Revit Setout Points Add-In" )]
-[assembly: AssemblyCopyright( "Copyright 2012 © Jeremy Tammik Autodesk Inc., The Building Coder" )]
+[assembly: AssemblyCopyright( "Copyright © 2012-2015 Jeremy Tammik Autodesk Inc., The Building Coder" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -33,5 +33,7 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 // 2014-11-03 2015.0.0.1 added instance transformation suggested by sanjaymann
-[assembly: AssemblyVersion( "2015.0.0.1" )]
-[assembly: AssemblyFileVersion( "2015.0.0.1" )]
+// 2015-09-09 2016.0.0.0 flat migration to Revit 2016
+//
+[assembly: AssemblyVersion( "2016.0.0.6" )]
+[assembly: AssemblyFileVersion( "2016.0.0.0" )]
