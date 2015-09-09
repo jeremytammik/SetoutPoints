@@ -35,5 +35,5 @@ using System.Runtime.InteropServices;
 // 2014-11-03 2015.0.0.1 added instance transformation suggested by sanjaymann
 // 2015-09-09 2016.0.0.0 flat migration to Revit 2016
 //
-[assembly: AssemblyVersion( "2016.0.0.6" )]
+[assembly: AssemblyVersion( "2016.0.0.0" )]
 [assembly: AssemblyFileVersion( "2016.0.0.0" )]
