@@ -34,6 +34,7 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 // 2014-11-03 2015.0.0.1 added instance transformation suggested by sanjaymann
 // 2015-09-09 2016.0.0.0 flat migration to Revit 2016
+// 2017-02-15 2017.0.0.0 flat migration to revit 2017 added test file upgraded setoutpoint symbol family
 //
-[assembly: AssemblyVersion( "2016.0.0.0" )]
-[assembly: AssemblyFileVersion( "2016.0.0.0" )]
+[assembly: AssemblyVersion( "2017.0.0.0" )]
+[assembly: AssemblyFileVersion( "2017.0.0.0" )]
