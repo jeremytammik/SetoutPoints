@@ -281,7 +281,8 @@ namespace SetoutPoints
 
     const string _directory =
       // "C:/a/doc/revit/blog/src/SetoutPoints/test/"; // 2013
-      "Z:/a/doc/revit/blog/src/SetoutPoints/test/"; // 2015
+      //"Z:/a/doc/revit/blog/src/SetoutPoints/test/"; // 2015
+      "C:/a/vs/SetoutPoints/test/"; // 2017
 
     const string _family_path
       = _directory + FamilyName + _extension;
@@ -418,6 +419,13 @@ namespace SetoutPoints
           if( doc.LoadFamily( _family_path,
             out family ) )
           {
+            foreach( ElementId id in family
+              .GetFamilySymbolIds() )
+            {
+              (doc.GetElement( id ) 
+                as FamilySymbol ).Activate();
+            }
+
             tx.Commit();
           }
           else
@@ -611,6 +619,9 @@ namespace SetoutPoints
               _point_number, PointString( p ) );
 
             XYZ p1 = t.OfPoint( p );
+
+            // Handle error saying, "The symbol is not 
+            // active.\r\nParameter name: symbol".
 
             FamilyInstance fi
               = doc.Create.NewFamilyInstance( p1,
