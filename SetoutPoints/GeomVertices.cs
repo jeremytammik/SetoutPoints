@@ -65,8 +65,8 @@ namespace SetoutPoints
     /// and will return a "corner" at each of the two arc
     /// end points.
     /// </summary>
-    static void GetCorners( 
-      Dictionary<XYZ, int> corners, 
+    static void GetCorners(
+      Dictionary<XYZ, int> corners,
       Solid solid )
     {
       foreach( Face f in solid.Faces )
@@ -94,7 +94,7 @@ namespace SetoutPoints
     /// and will return a "corner" at each of the two arc
     /// end points.
     /// </summary>
-    public static Dictionary<XYZ, int> GetCorners( 
+    public static Dictionary<XYZ, int> GetCorners(
       List<Solid> solids )
     {
       Dictionary<XYZ, int> corners
@@ -108,8 +108,15 @@ namespace SetoutPoints
       return corners;
     }
 
-    public static BboxInfo GetSolidsBoundingBoxInfo( 
-      Dictionary<XYZ, int> dict, 
+    /// <summary>
+    /// Return a bounding box containing all vertices
+    /// in the given dictionary. Cf. also the 
+    /// ExpandToContain extension method defined by the
+    /// class JtBoundingBoxXyzExtensionMethods in 
+    /// The Building Coder samples Util.cs.
+    /// </summary>
+    public static BboxInfo GetSolidsBoundingBoxInfo(
+      Dictionary<XYZ, int> dict,
       ref Transform t )
     {
       double minX = double.MaxValue;
@@ -147,18 +154,19 @@ namespace SetoutPoints
         }
       }
 
-      XYZ centerPoint = new XYZ( minX + ( ( maxX - minX ) / 2 ), minY + ( ( maxY - minY ) / 2 ), minZ + ( ( maxZ - minZ ) / 2 ) );
-      double halfWidth = Math.Abs( maxX - minX ) / 2;
-      double halfDepth = Math.Abs( maxY - minY ) / 2;
-      double halfHeight = Math.Abs( maxZ - minZ ) / 2;
+      XYZ centerPoint = new XYZ( 0.5 * ( minX + maxX ),
+        0.5 * ( minY + maxY ), 0.5 * ( minZ + maxZ ) );
 
+      double halfWidth = 0.5 * ( maxX - minX );
+      double halfDepth = 0.5 * ( maxY - minY );
+      double halfHeight = 0.5 * ( maxZ - minZ );
 
       centerPoint = t.OfPoint( centerPoint );
 
-      BboxInfo bbInfo = new BboxInfo( centerPoint, halfWidth, halfDepth, halfHeight );
+      BboxInfo bbInfo = new BboxInfo( centerPoint,
+        halfWidth, halfDepth, halfHeight );
 
       return bbInfo;
-
     }
 
     /// <summary>
@@ -171,9 +179,9 @@ namespace SetoutPoints
     /// instance transform to map it backto the actual
     /// instance project location.
     /// </summary>
-    public static List<Solid> GetSolids( 
-      Element e, 
-      Options opt, 
+    public static List<Solid> GetSolids(
+      Element e,
+      Options opt,
       out Transform t )
     {
       GeometryElement geo = e.get_Geometry( opt );
@@ -221,14 +229,15 @@ namespace SetoutPoints
 
   public class BboxInfo
   {
-
     private XYZ _centerPoint;
     private double _halfwidth;
     private double _halfDepth;
     private double _halfHeight;
 
-
-    public BboxInfo( XYZ point, double halfWidth, double halfDepth, double halfHeight )
+    public BboxInfo( XYZ point,
+      double halfWidth,
+      double halfDepth,
+      double halfHeight )
     {
       _centerPoint = point;
       _halfwidth = halfWidth;
