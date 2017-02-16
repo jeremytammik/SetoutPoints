@@ -80,6 +80,7 @@
     <Compile Include="App.cs" />
     <Compile Include="CmdRenumber.cs" />
     <Compile Include="CmdGeomVertices.cs" />
+    <Compile Include="GeomVertices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
