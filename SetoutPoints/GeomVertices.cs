@@ -69,10 +69,6 @@ namespace SetoutPoints
       Dictionary<XYZ, int> corners, 
       Solid solid )
     {
-      //Dictionary<XYZ, int> corners
-      //  = new Dictionary<XYZ, int>(
-      //    new XyzEqualityComparer() );
-
       foreach( Face f in solid.Faces )
       {
         foreach( EdgeArray ea in f.EdgeLoops )
