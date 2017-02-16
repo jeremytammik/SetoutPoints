@@ -19,7 +19,7 @@ namespace SetoutPoints
     /// Return a string for a real number
     /// formatted to two decimal places.
     /// </summary>
-    public static string RealString( double a )
+    static string RealString( double a )
     {
       return a.ToString( "0.##" );
     }
@@ -41,7 +41,7 @@ namespace SetoutPoints
     /// Define equality for Revit XYZ points.
     /// Very rough tolerance, as used by Revit itself.
     /// </summary>
-    public class XyzEqualityComparer : IEqualityComparer<XYZ>
+    class XyzEqualityComparer : IEqualityComparer<XYZ>
     {
       const double _sixteenthInchInFeet
         = 1.0 / ( 16.0 * 12.0 );

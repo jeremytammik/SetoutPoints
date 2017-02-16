@@ -471,7 +471,8 @@ namespace SetoutPoints
             continue;
           }
 
-          Dictionary<XYZ, int> corners = GeomVertices.GetCorners( solids );
+          Dictionary<XYZ, int> corners 
+            = GeomVertices.GetCorners( solids );
 
           int n = corners.Count;
 
