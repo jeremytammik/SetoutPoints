@@ -422,7 +422,7 @@ namespace SetoutPoints
             foreach( ElementId id in family
               .GetFamilySymbolIds() )
             {
-              (doc.GetElement( id ) 
+              ( doc.GetElement( id )
                 as FamilySymbol ).Activate();
             }
 
