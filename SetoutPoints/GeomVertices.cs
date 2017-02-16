@@ -41,7 +41,7 @@ namespace SetoutPoints
     /// Define equality for Revit XYZ points.
     /// Very rough tolerance, as used by Revit itself.
     /// </summary>
-    class XyzEqualityComparer : IEqualityComparer<XYZ>
+    public class XyzEqualityComparer : IEqualityComparer<XYZ>
     {
       const double _sixteenthInchInFeet
         = 1.0 / ( 16.0 * 12.0 );
@@ -59,12 +59,47 @@ namespace SetoutPoints
     }
 
     /// <summary>
+    /// Return all the "corner" vertices of a given solid
+    /// by adding them to the dictionary passed in.
+    /// Note that a circle in Revit consists of two arcs
+    /// and will return a "corner" at each of the two arc
+    /// end points.
+    /// </summary>
+    static void GetCorners( 
+      Dictionary<XYZ, int> corners, 
+      Solid solid )
+    {
+      //Dictionary<XYZ, int> corners
+      //  = new Dictionary<XYZ, int>(
+      //    new XyzEqualityComparer() );
+
+      foreach( Face f in solid.Faces )
+      {
+        foreach( EdgeArray ea in f.EdgeLoops )
+        {
+          foreach( Edge e in ea )
+          {
+            XYZ p = e.AsCurveFollowingFace( f )
+              .GetEndPoint( 0 );
+
+            if( !corners.ContainsKey( p ) )
+            {
+              corners[p] = 0;
+            }
+            ++corners[p];
+          }
+        }
+      }
+    }
+
+    /// <summary>
     /// Return all the "corner" vertices of a given solid.
     /// Note that a circle in Revit consists of two arcs
     /// and will return a "corner" at each of the two arc
     /// end points.
     /// </summary>
-    public static Dictionary<XYZ, int> GetCorners( List<Solid> solids )
+    public static Dictionary<XYZ, int> GetCorners( 
+      List<Solid> solids )
     {
       Dictionary<XYZ, int> corners
         = new Dictionary<XYZ, int>(
@@ -72,25 +107,8 @@ namespace SetoutPoints
 
       foreach( Solid solid in solids )
       {
-        foreach( Face f in solid.Faces )
-        {
-          foreach( EdgeArray ea in f.EdgeLoops )
-          {
-            foreach( Edge e in ea )
-            {
-              XYZ p = e.AsCurveFollowingFace( f )
-                .GetEndPoint( 0 );
-
-              if( !corners.ContainsKey( p ) )
-              {
-                corners[p] = 0;
-              }
-              ++corners[p];
-            }
-          }
-        }
+        GetCorners( corners, solid );
       }
-
       return corners;
     }
 
@@ -147,7 +165,20 @@ namespace SetoutPoints
 
     }
 
-    public static List<Solid> GetSolids( Element e, Options opt, out Transform t )
+    /// <summary>
+    /// Retrieve the non-empty solids found for 
+    /// the given element. In case the element is a 
+    /// family instance, it may have its own non-empty
+    /// solids, in which case we use those. Otherwise,
+    /// we search the symbol geometry. If we use the 
+    /// symbol geometry, we have to keep track of the 
+    /// instance transform to map it backto the actual
+    /// instance project location.
+    /// </summary>
+    public static List<Solid> GetSolids( 
+      Element e, 
+      Options opt, 
+      out Transform t )
     {
       GeometryElement geo = e.get_Geometry( opt );
 
@@ -168,7 +199,6 @@ namespace SetoutPoints
         if( null != solid && 0 < solid.Faces.Size )
         {
           solids.Add( solid );
-          //break;
         }
 
         inst = obj as GeometryInstance;
@@ -182,16 +212,15 @@ namespace SetoutPoints
         foreach( GeometryObject obj in geo )
         {
           Solid solid = obj as Solid;
+
           if( null != solid && 0 < solid.Faces.Size )
           {
             solids.Add( solid );
-            //break;
           }
         }
       }
       return solids;
     }
-
   }
 
   public class BboxInfo

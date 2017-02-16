@@ -36,6 +36,7 @@ using System.Runtime.InteropServices;
 // 2015-09-09 2016.0.0.0 flat migration to Revit 2016
 // 2017-02-15 2017.0.0.0 flat migration to revit 2017 added test file upgraded setoutpoint symbol family
 // 2017-02-16 2017.0.0.1 integrated GeomVertices class by Jan Grenov
+// 2017-02-16 2017.0.0.2 removed original methods duplicated by GeomVertices class
 //
-[assembly: AssemblyVersion( "2017.0.0.1" )]
-[assembly: AssemblyFileVersion( "2017.0.0.1" )]
+[assembly: AssemblyVersion( "2017.0.0.2" )]
+[assembly: AssemblyFileVersion( "2017.0.0.2" )]

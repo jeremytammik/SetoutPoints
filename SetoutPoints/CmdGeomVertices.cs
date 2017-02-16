@@ -16,28 +16,6 @@ namespace SetoutPoints
   public class CmdGeomVertices : IExternalCommand
   {
     /// <summary>
-    /// Return a string for a real number
-    /// formatted to two decimal places.
-    /// </summary>
-    public static string RealString( double a )
-    {
-      return a.ToString( "0.##" );
-    }
-
-    /// <summary>
-    /// Return a string for an XYZ point
-    /// or vector with its coordinates
-    /// formatted to two decimal places.
-    /// </summary>
-    public static string PointString( XYZ p )
-    {
-      return string.Format( "({0},{1},{2})",
-        RealString( p.X ),
-        RealString( p.Y ),
-        RealString( p.Z ) );
-    }
-
-    /// <summary>
     /// Classify the possible setup point 
     /// host geometry types that we support.
     /// </summary>
@@ -120,59 +98,6 @@ namespace SetoutPoints
       return string.Format( "{0} {1}{2}{3}<{4} {5}>",
         typeName, categoryName, familyName, symbolName,
         e.Id.IntegerValue, e.Name );
-    }
-
-    /// <summary>
-    /// Define equality for Revit XYZ points.
-    /// Very rough tolerance, as used by Revit itself.
-    /// </summary>
-    class XyzEqualityComparer : IEqualityComparer<XYZ>
-    {
-      const double _sixteenthInchInFeet
-        = 1.0 / ( 16.0 * 12.0 );
-
-      public bool Equals( XYZ p, XYZ q )
-      {
-        return p.IsAlmostEqualTo( q,
-          _sixteenthInchInFeet );
-      }
-
-      public int GetHashCode( XYZ p )
-      {
-        return PointString( p ).GetHashCode();
-      }
-    }
-
-    /// <summary>
-    /// Return all the "corner" vertices of a given solid.
-    /// Note that a circle in Revit consists of two arcs
-    /// and will return a "corner" at each of the two arc
-    /// end points.
-    /// </summary>
-    Dictionary<XYZ, int> GetCorners( Solid solid )
-    {
-      Dictionary<XYZ, int> corners
-        = new Dictionary<XYZ, int>(
-          new XyzEqualityComparer() );
-
-      foreach( Face f in solid.Faces )
-      {
-        foreach( EdgeArray ea in f.EdgeLoops )
-        {
-          foreach( Edge e in ea )
-          {
-            XYZ p = e.AsCurveFollowingFace( f )
-              .GetEndPoint( 0 );
-
-            if( !corners.ContainsKey( p ) )
-            {
-              corners[p] = 0;
-            }
-            ++corners[p];
-          }
-        }
-      }
-      return corners;
     }
 
     /// <summary>
@@ -331,7 +256,7 @@ namespace SetoutPoints
           bp.get_Parameter( bip[2] ).AsDouble() );
 
         Debug.Print( "base point {0}",
-          PointString( basePoint ) );
+          GeomVertices.PointString( basePoint ) );
 
         p = bp.get_Parameter( bip[3] );
 
@@ -461,65 +386,6 @@ namespace SetoutPoints
       return symbols;
     }
 
-    /// <summary>
-    /// Retrieve the first non-empty solid found for 
-    /// the given element. In case the element is a 
-    /// family instance, it may have its own non-empty
-    /// solid, in which case we use that. Otherwise we 
-    /// search the symbol geometry. If we use the 
-    /// symbol geometry, we have to keep track of the 
-    /// instance transform to map it to the actual
-    /// instance project location.
-    /// </summary>
-    Solid GetSolid(
-      Element e,
-      Options opt,
-      out Transform t )
-    {
-      GeometryElement geo = e.get_Geometry( opt );
-
-      Solid solid = null;
-      GeometryInstance inst = null;
-      t = Transform.Identity;
-
-      // Some columns have no solids, and we have to 
-      // retrieve the geometry from the symbol; 
-      // others do have solids on the instance itself 
-      // and no contents in the instance geometry 
-      // (e.g. in rst_basic_sample_project.rvt).
-
-      foreach( GeometryObject obj in geo )
-      {
-        solid = obj as Solid;
-
-        if( null != solid
-          && 0 < solid.Faces.Size )
-        {
-          break;
-        }
-
-        inst = obj as GeometryInstance;
-      }
-
-      if( null == solid && null != inst )
-      {
-        geo = inst.GetSymbolGeometry();
-        t = inst.Transform;
-
-        foreach( GeometryObject obj in geo )
-        {
-          solid = obj as Solid;
-
-          if( null != solid
-            && 0 < solid.Faces.Size )
-          {
-            break;
-          }
-        }
-      }
-      return solid;
-    }
-
     //const double _feetToMm = 25.4 * 12.0;
 
     /// <summary>
@@ -591,11 +457,12 @@ namespace SetoutPoints
         foreach( Element e in col )
         {
           Transform t;
-          Solid solid = GetSolid( e, opt, out t );
+          List<Solid> solids = GeomVertices.GetSolids( 
+            e, opt, out t );
 
           string desc = ElementDescription( e );
 
-          if( null == solid )
+          if( null == solids || 0 == solids.Count )
           {
             Debug.Print(
               "Unable to access element solid for element {0}.",
@@ -604,19 +471,19 @@ namespace SetoutPoints
             continue;
           }
 
-          Dictionary<XYZ, int> corners
-            = GetCorners( solid );
+          Dictionary<XYZ, int> corners = GeomVertices.GetCorners( solids );
 
           int n = corners.Count;
 
-          Debug.Print( "{0}: {1} corners found:", desc, n );
+          Debug.Print( "{0}: {1} corners found:", 
+            desc, n );
 
           foreach( XYZ p in corners.Keys )
           {
             ++_point_number;
 
-            Debug.Print( "  {0}: {1}",
-              _point_number, PointString( p ) );
+            Debug.Print( "  {0}: {1}", _point_number, 
+              GeomVertices.PointString( p ) );
 
             XYZ p1 = t.OfPoint( p );
 
