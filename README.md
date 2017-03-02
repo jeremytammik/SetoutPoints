@@ -5,6 +5,7 @@ Revit add-in for automatic placement and management of structural concrete setou
 For a detailed description, please refer to The Building Coder discussion
 of [Structural Concrete Setout Point Add-in](http://thebuildingcoder.typepad.com/blog/2012/08/structural-concrete-setout-point-add-in.html).
 
+
 ## Further Reading
 
 - [Melbourne DevLab](http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-devlab.html)
@@ -22,7 +23,6 @@ Jeremy Tammik,
 [ADN](http://www.autodesk.com/adn)
 [Open](http://www.autodesk.com/adnopen),
 [Autodesk Inc.](http://www.autodesk.com)
-
 
 
 ## License
